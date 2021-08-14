@@ -23,6 +23,10 @@ spec:
         image: springland/istio-demo-frontend
         ports:
         - containerPort: 8080
+        env:
+          - name: backendurl
+            value: "http://istio-demo-backend:8080"
+
 
 ---
 ##################################################################################################
@@ -62,10 +66,12 @@ spec:
   selector:
     matchLabels:
       app: istio-demo-backend
+      version: v1
   template:
     metadata:
       labels:
         app: istio-demo-backend
+        version: v1
     spec:
       containers:
       - name: backend
@@ -95,10 +101,12 @@ spec:
   selector:
     matchLabels:
       app: istio-demo-backend
+      version: v2
   template:
     metadata:
       labels:
         app: istio-demo-backend
+        version: v2
     spec:
       containers:
       - name: backend
@@ -117,10 +125,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: istio-demo-backend
   labels:
-    app: backend
-    service: backend
+    app: istio-demo-backend
+    service: istio-demo-backend
 spec:
   type: NodePort
   ports:
