@@ -1,0 +1,131 @@
+#
+# Front end deployment
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-demo-frontend
+  namespace: istio-demo
+  labels:
+    app: istio-demo-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-demo-frontend
+  template:
+    metadata:
+      labels:
+        app: istio-demo-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: springland/istio-demo-frontend
+        ports:
+        - containerPort: 8080
+
+---
+##################################################################################################
+# Front end service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+    service: frontend
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  selector:
+    app: istio-demo-frontend
+
+---
+#
+# backend v1
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-demo-backend-v1
+  namespace: istio-demo
+  labels:
+    app: istio-demo-backend
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-demo-backend
+  template:
+    metadata:
+      labels:
+        app: istio-demo-backend
+    spec:
+      containers:
+      - name: backend
+        image: springland/istio-demo-backend
+        ports:
+        - containerPort: 8080
+        env:
+          - name: version
+            value: "v1"
+
+
+---
+#
+# backend v2
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-demo-backend-v2
+  namespace: istio-demo
+  labels:
+    app: istio-demo-backend
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-demo-backend
+  template:
+    metadata:
+      labels:
+        app: istio-demo-backend
+    spec:
+      containers:
+      - name: backend
+        image: springland/istio-demo-backend
+        ports:
+        - containerPort: 8080
+        env:
+          - name: version
+            value: "v2"
+
+---
+
+##################################################################################################
+# Back end service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels:
+    app: backend
+    service: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  selector:
+    app: istio-demo-backend
